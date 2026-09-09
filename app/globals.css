@@ -3,6 +3,10 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  --primary-color: #1e3a8a;
+  --secondary-color: #f1f5f9;
+  --card-radius: 12px;
 }
 
 @theme inline {
