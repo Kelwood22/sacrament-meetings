@@ -1,7 +1,16 @@
-import { getMeetings } from "@/lib/meetings-db";
+import MeetingCard from "@/components/MeetingCard";
+import { SacramentMeeting } from "@/lib/types";
 
-export default function MeetingsPage() {
-  const meetings = getMeetings();
+export default async function MeetingsPage() {
+  const response = await fetch(
+    "http://localhost:3000/api/meetings",
+    {
+      cache: "no-store",
+    }
+  );
+
+  const meetings: SacramentMeeting[] =
+    await response.json();
 
   return (
     <div className="p-6">
@@ -9,15 +18,14 @@ export default function MeetingsPage() {
         All Meetings
       </h1>
 
-      {meetings.map((meeting) => (
-        <div
-          key={meeting.id}
-          className="border p-4 rounded mb-3"
-        >
-          <p>{meeting.date}</p>
-          <p>{meeting.meetingType}</p>
-        </div>
-      ))}
+      <div className="space-y-4">
+        {meetings.map((meeting) => (
+          <MeetingCard
+            key={meeting.id}
+            meeting={meeting}
+          />
+        ))}
+      </div>
     </div>
   );
 }
