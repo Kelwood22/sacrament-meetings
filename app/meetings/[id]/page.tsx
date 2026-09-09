@@ -1,5 +1,5 @@
 import MeetingDetail from "@/components/MeetingDetail";
-import { SacramentMeeting } from "@/lib/types";
+import { getMeetingById } from "@/lib/meetings-db";
 
 export default async function MeetingPage({
   params,
@@ -8,19 +8,11 @@ export default async function MeetingPage({
 }) {
   const { id } = await params;
 
-  const response = await fetch(
-    `http://localhost:3000/api/meetings/${id}`,
-    {
-      cache: "no-store",
-    }
-  );
+  const meeting = getMeetingById(Number(id));
 
-  if (!response.ok) {
+  if (!meeting) {
     return <p>Meeting not found.</p>;
   }
-
-  const meeting: SacramentMeeting =
-    await response.json();
 
   return <MeetingDetail meeting={meeting} />;
 }

@@ -1,16 +1,8 @@
 import MeetingCard from "@/components/MeetingCard";
-import { SacramentMeeting } from "@/lib/types";
+import { getMeetings } from "@/lib/meetings-db";
 
-export default async function MeetingsPage() {
-  const response = await fetch(
-    "http://localhost:3000/api/meetings",
-    {
-      cache: "no-store",
-    }
-  );
-
-  const meetings: SacramentMeeting[] =
-    await response.json();
+export default function MeetingsPage() {
+  const meetings = getMeetings();
 
   return (
     <div className="p-6">
