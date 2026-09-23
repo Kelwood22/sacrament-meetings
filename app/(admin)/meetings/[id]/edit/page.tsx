@@ -1,24 +1,19 @@
 import { getMeetingById } from "@/lib/meetings-db";
-import { updateMeeting } from "@/lib/actions";
+import { notFound } from "next/navigation";
+import EditMeetingForm from "./EditMeetingForm";
 
 export default async function EditMeetingPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const meeting = await getMeetingById(
-    Number(params.id)
+    Number((await params).id)
   );
 
   if (!meeting) {
-    return <p>Meeting not found.</p>;
+    notFound();
   }
-
-  const updateMeetingWithId =
-    updateMeeting.bind(
-      null,
-      Number(params.id)
-    );
 
   return (
     <main className="p-6">
@@ -26,60 +21,10 @@ export default async function EditMeetingPage({
         Edit Meeting
       </h1>
 
-      <form action={updateMeetingWithId}>
-        <input
-          type="date"
-          name="date"
-          defaultValue={meeting.date}
-          className="border p-2 w-full"
-        />
-
-        <select
-          name="meeting_type"
-          defaultValue={meeting.meetingType}
-          className="border p-2 w-full"
-        >
-          <option value="regular">Regular</option>
-          <option value="testimony">Testimony</option>
-          <option value="stake">Stake</option>
-          <option value="general">General</option>
-        </select>
-
-        <input
-          type="text"
-          name="presiding"
-          defaultValue={meeting.presiding}
-          className="border p-2 w-full"
-        />
-
-        <input
-          type="text"
-          name="conducting"
-          defaultValue={meeting.conducting}
-          className="border p-2 w-full"
-        />
-
-        <input
-          type="text"
-          name="opening_prayer"
-          defaultValue={meeting.openingPrayer}
-          className="border p-2 w-full"
-        />
-
-        <input
-          type="text"
-          name="closing_prayer"
-          defaultValue={meeting.closingPrayer}
-          className="border p-2 w-full"
-        />
-
-        <button
-          type="submit"
-          className="bg-green-600 text-white px-4 py-2 rounded"
-        >
-          Update Meeting
-        </button>
-      </form>
+      <EditMeetingForm
+        meeting={meeting}
+        id={Number((await params).id)}
+      />
     </main>
   );
 }

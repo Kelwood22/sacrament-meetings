@@ -9,18 +9,52 @@ import {
   deleteMeeting as deleteMeetingDB,
 } from "./meetings-db";
 
+export type State = {
+  errors?: {
+    date?: string[];
+    meeting_type?: string[];
+    presiding?: string[];
+    conducting?: string[];
+    opening_prayer?: string[];
+    closing_prayer?: string[];
+  };
+  message?: string | null;
+};
+
+
 const MeetingFormSchema = z.object({
-    date: z.string(),
-    meeting_type: z.string(),
-    presiding: z.string(),
-    conducting: z.string(),
-    opening_prayer: z.string(),
-    closing_prayer: z.string(),
+  date: z.string().min(1, "Date is required"),
+
+  meeting_type: z.string().min(
+    1,
+    "Meeting type is required"
+  ),
+
+  presiding: z.string().min(
+    1,
+    "Presiding leader is required"
+  ),
+
+  conducting: z.string().min(
+    1,
+    "Conducting leader is required"
+  ),
+
+  opening_prayer: z.string().min(
+    1,
+    "Opening prayer is required"
+  ),
+
+  closing_prayer: z.string().min(
+    1,
+    "Closing prayer is required"
+  ),
 });
 
 export async function addMeeting(
-  formData: FormData
-) {
+    prevState: State,
+    formData: FormData
+): Promise<State> {
   const validatedFields =
     MeetingFormSchema.safeParse({
       date: formData.get("date"),
@@ -31,10 +65,15 @@ export async function addMeeting(
       closing_prayer: formData.get("closing_prayer"),
     });
 
-  if (!validatedFields.success) {
-    throw new Error("Invalid form data");
-  }
+if (!validatedFields.success) {
+  return {
+    errors:
+      validatedFields.error.flatten().fieldErrors,
+    message: "Missing required fields.",
+  };
+}
 
+    try {
     await addMeetingDB({
     ...validatedFields.data,
 
@@ -58,15 +97,20 @@ export async function addMeeting(
     speakers: [],
     stake_business: false,
     });
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to add meeting.");
+  }
 
   revalidatePath("/meetings");
   redirect("/meetings");
 }
 
 export async function updateMeeting(
-  id: number,
+    id: number,
+    prevState: State,
   formData: FormData
-) {
+): Promise<State> {
   const validatedFields =
     MeetingFormSchema.safeParse({
       date: formData.get("date"),
@@ -77,14 +121,15 @@ export async function updateMeeting(
       closing_prayer: formData.get("closing_prayer"),
     });
 
-if (!validatedFields.success) {
-  throw new Error("Missing required fields.");
-}
-
   if (!validatedFields.success) {
-throw new Error("Invalid form data");
+return {
+  errors:
+    validatedFields.error.flatten().fieldErrors,
+  message: "Missing required fields.",
+};
 }
 
+    try {
     await updateMeetingDB(id, {
     ...validatedFields.data,
     
@@ -111,12 +156,27 @@ throw new Error("Invalid form data");
     
     revalidatePath("/meetings");
     redirect("/meetings");
+    } catch (error) {
+      console.error(error);
+      throw new Error("Failed to update meeting.");
     }
+}
 
 export async function deleteMeeting(
   id: number
 ) {
-  await deleteMeetingDB(id);
+    try {
+      await deleteMeetingDB(id);
+    } catch (error) {
+      console.error(error);
+      throw new Error("Failed to delete meeting.");
+    }
 
-  revalidatePath("/meetings");
+    revalidatePath("/meetings");
+    redirect("/meetings");
+
+    return {
+    errors: {},
+    message: null,
+    };
 }
