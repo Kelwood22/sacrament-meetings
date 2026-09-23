@@ -1,5 +1,5 @@
 import { neon } from '@neondatabase/serverless';
-import type { SacramentMeeting } from './types';
+import type { SacramentMeeting, MeetingFormData } from './types';
 
 const sql = neon(process.env.DATABASE_URL!);
 
@@ -79,19 +79,65 @@ export async function getMeetingById(
   return (rows[0] as unknown as SacramentMeeting) ?? null;
 }
 
-export async function addMeeting(
-  data: Omit<SacramentMeeting, 'id'>
-): Promise<SacramentMeeting> {
-  throw new Error('addMeeting: database implementation coming in Week 04');
+export async function addMeeting(meeting: MeetingFormData) {
+  await sql`
+    INSERT INTO meetings (
+  date,
+  meeting_type,
+  presiding,
+  conducting,
+  announcements,
+  opening_hymn,
+  opening_prayer,
+  ward_business,
+  stake_business,
+  sacrament_hymn,
+  speakers,
+  closing_hymn,
+  closing_prayer
+)
+VALUES (
+  ${meeting.date},
+  ${meeting.meeting_type},
+  ${meeting.presiding},
+  ${meeting.conducting},
+  ${meeting.announcements},
+  ${meeting.opening_hymn},
+  ${meeting.opening_prayer},
+  ${meeting.ward_business},
+  ${meeting.stake_business},
+  ${meeting.sacrament_hymn},
+  ${meeting.speakers},
+  ${meeting.closing_hymn},
+  ${meeting.closing_prayer}
+)
+  `;
 }
 
-export async function updateMeeting(
-  id: number,
-  updates: Partial<SacramentMeeting>
-): Promise<SacramentMeeting | null> {
-  throw new Error('updateMeeting: database implementation coming in Week 04');
+export async function updateMeeting(id: number, meeting: MeetingFormData) {
+  await sql`
+    UPDATE meetings
+    SET
+      date = ${meeting.date},
+      meeting_type = ${meeting.meeting_type},
+      presiding = ${meeting.presiding},
+      conducting = ${meeting.conducting},
+      announcements = ${meeting.announcements},
+      opening_hymn = ${meeting.opening_hymn},
+      opening_prayer = ${meeting.opening_prayer},
+      ward_business = ${meeting.ward_business},
+      stake_business = ${meeting.stake_business},
+      sacrament_hymn = ${meeting.sacrament_hymn},
+      speakers = ${meeting.speakers},
+      closing_hymn = ${meeting.closing_hymn},
+      closing_prayer = ${meeting.closing_prayer}
+    WHERE id = ${id}
+  `;
 }
 
-export async function deleteMeeting(id: number): Promise<boolean> {
-  throw new Error('deleteMeeting: database implementation coming in Week 04');
+export async function deleteMeeting(id: number) {
+  await sql`
+    DELETE FROM meetings
+    WHERE id = ${id}
+  `;
 }
