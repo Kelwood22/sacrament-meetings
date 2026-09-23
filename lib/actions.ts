@@ -174,9 +174,4 @@ export async function deleteMeeting(
 
     revalidatePath("/meetings");
     redirect("/meetings");
-
-    return {
-    errors: {},
-    message: null,
-    };
 }

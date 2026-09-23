@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { deleteMeeting } from "@/lib/actions";
 import { SacramentMeeting } from "@/lib/types";
 
 type MeetingCardProps = {
@@ -8,6 +9,9 @@ type MeetingCardProps = {
 export default function MeetingCard({
   meeting,
 }: MeetingCardProps) {
+  const deleteMeetingWithId =
+    deleteMeeting.bind(null, meeting.id);
+
   return (
     <div className="border rounded p-4 shadow">
       <h2 className="text-xl font-semibold">
@@ -18,9 +22,20 @@ export default function MeetingCard({
         Type: {meeting.meetingType}
       </p>
 
-      <Link href={`/meetings/${meeting.id}`} className="text-blue-600 hover:underline">
-        View Details
-      </Link>
+      <div className="flex gap-2 mt-4">
+        <Link href={`/meetings/${meeting.id}`} className="text-blue-600 hover:underline">
+          View Details
+        </Link>
+
+        <form action={deleteMeetingWithId}>
+          <button
+            type="submit"
+            className="bg-red-600 text-white px-3 py-1 rounded"
+          >
+            Delete
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
