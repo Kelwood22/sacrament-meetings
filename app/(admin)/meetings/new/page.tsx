@@ -2,11 +2,14 @@
 
 import { useActionState } from "react";
 import { addMeeting } from "@/lib/actions";
+import { SignOutButton } from "@/components/sign-out-button";
+
 
 const initialState = {
   message: null,
   errors: {},
 };
+
 
 export default function NewMeetingPage() {
   const [state, formAction, isPending] =
@@ -16,6 +19,10 @@ export default function NewMeetingPage() {
       <h1 className="text-2xl font-bold mb-4">
         Create Meeting
       </h1>
+
+      <div className="mb-4 flex justify-end">
+        <SignOutButton />
+      </div>
 
       <form action={formAction}>
         <label htmlFor="date" className="block mb-2">
